@@ -11,7 +11,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Intialize app
-        run: npm init
+        run: npm init .
       - name: Run Lint
         run: npm run lint
   test:
@@ -25,7 +25,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Intialize app
-        run: npm init
+        run: npm init .
       - name: Run Tests
         run: npm test
   deploy:
