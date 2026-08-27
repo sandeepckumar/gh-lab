@@ -30,12 +30,13 @@ jobs:
       - name: TF Plan
         run: terraform plan -no-color -input=false -out tfplan
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: tf-plan
           path: tfplan
   apply:
     name: TF Apply
+    needs: plan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,7 +51,7 @@ jobs:
           aws-region: ap-south-2
           role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
           name: tf-plan
       - name: Terraform INIT
