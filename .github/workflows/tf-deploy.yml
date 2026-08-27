@@ -27,6 +27,11 @@ jobs:
         with:
           aws-region: ap-south-2
           role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: tf-dep-provider-${{ hashFiles('**/.terraform.lock.hcl') }}
       - name: TF INIT
         run: terraform init -input=false
       - name: TF Plan
@@ -61,6 +66,11 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: tf-plan
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: tf-dep-provider-${{ hashFiles('**/.terraform.lock.hcl') }}
       - name: Terraform INIT
         run: terraform init -input=false
       - name: Terraform apply
