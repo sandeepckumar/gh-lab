@@ -27,8 +27,12 @@ jobs:
         with:
           aws-region: ap-south-2
           role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: Configure Terraform plugin cache
+        run: |
+          echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >>"$GITHUB_ENV"
+          mkdir --parents "$HOME/.terraform.d/plugin-cache"
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: tf-dep-provider-${{ hashFiles('**/.terraform.lock.hcl') }}
@@ -67,7 +71,7 @@ jobs:
         with:
           name: tf-plan
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: tf-dep-provider-${{ hashFiles('**/.terraform.lock.hcl') }}
