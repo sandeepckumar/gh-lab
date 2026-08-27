@@ -13,6 +13,8 @@ jobs:
   plan:
     name: TF Plan
     runs-on: ubuntu-latest
+    output:
+      plan-file: ${{ steps.publish.outputs.plan-file }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,12 +30,15 @@ jobs:
       - name: TF INIT
         run: terraform init -input=false
       - name: TF Plan
-        run: terraform plan -no-color -input=false -out tfplan
+        run: terraform plan -no-color -input=false -out tfplan.tfplan
+      - name: Publish plan filename
+        id: publish
+        run: find ./*.tfplan -type f -execdir echo 'plan-file={}' >> $GITHUB_OUTPUT ';'
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: tf-plan
-          path: tfplan
+          path: tfplan.tfplan
   apply:
     name: TF Apply
     needs: plan
@@ -50,6 +55,8 @@ jobs:
         with:
           aws-region: ap-south-2
           role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: Output file name
+        run: echo "${{ needs.plan.outputs.plan-file }}"
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
@@ -57,4 +64,4 @@ jobs:
       - name: Terraform INIT
         run: terraform init -input=false
       - name: Terraform apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve ${{ needs.plan.outputs.plan-file }}

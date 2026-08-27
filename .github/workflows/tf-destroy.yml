@@ -13,7 +13,7 @@ jobs:
       - name: install terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform-version: "1.15.3"
+          terraform_version: "1.15.3"
       - name: configure aws oidc
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
@@ -22,4 +22,4 @@ jobs:
       - name: terraform init
         run: terraform init -input=false
       - name: terrform destroy
-        run: terraform apply -destory -auto-approve
+        run: terraform apply -destroy -auto-approve
