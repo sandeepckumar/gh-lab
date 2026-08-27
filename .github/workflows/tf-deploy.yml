@@ -13,7 +13,7 @@ jobs:
   plan:
     name: TF Plan
     runs-on: ubuntu-latest
-    output:
+    outputs:
       plan-file: ${{ steps.publish.outputs.plan-file }}
     steps:
       - name: Checkout code
