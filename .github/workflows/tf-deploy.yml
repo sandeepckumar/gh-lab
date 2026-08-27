@@ -1,0 +1,59 @@
+name: TF Deploy Workflow
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  read-content: true
+
+jobs:
+  plan:
+    name: TF Plan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.15.3"
+      - name: Config aws OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          aws-region: ap-south-2
+          role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: TF INIT
+        run: terraform init -input=false
+      - name: TF Plan
+        run: terraform plan -no-color -input=false -out tfplan
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tf-plan
+          path: tfplan
+  apply:
+    name: TF Apply
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.15.3"
+      - name: Configure aws OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          aws-region: ap-south-2
+          role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: tf-plan
+      - name: Terraform INIT
+        run: terraform init -input=false
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan

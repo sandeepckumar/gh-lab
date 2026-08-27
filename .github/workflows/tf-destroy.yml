@@ -1,0 +1,25 @@
+name: Terraform Destroy Workflow
+on: workflow_dispatch
+permissions:
+  id-token: write
+  read-content: true
+jobs:
+  destroy:
+    name: run destroy
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: install terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform-version: "1.15.3"
+      - name: configure aws oidc
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          aws-region: ap-south-2
+          role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+      - name: terraform init
+        run: terraform init -input=false
+      - name: terrform destroy
+        run: terraform apply -destory -auto-approve
