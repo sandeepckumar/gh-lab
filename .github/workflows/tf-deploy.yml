@@ -1,4 +1,4 @@
-name: TF Deploy Workflow
+name: TF Deploy
 on:
   push:
     branches:
