@@ -10,16 +10,20 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+
       - name: install terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.15.3"
+
       - name: configure aws oidc
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
-          aws-region: ap-south-2
+          aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE }}
+
       - name: terraform init
         run: terraform init -input=false
+
       - name: terrform destroy
         run: terraform apply -destroy -auto-approve
