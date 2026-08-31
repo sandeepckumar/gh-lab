@@ -18,7 +18,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           aws-region: ap-south-2
-          role-to-assume: arn:aws:iam::496113530799:role/tf-lab-github
+          role-to-assume: ${{ vars.AWS_ROLE }}
       - name: terraform init
         run: terraform init -input=false
       - name: terrform destroy

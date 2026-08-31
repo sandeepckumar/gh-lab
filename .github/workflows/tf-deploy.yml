@@ -5,9 +5,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  AWS_ROLE: arn:aws:iam::496113530799:role/tf-lab-github
-
 permissions:
   id-token: write
   contents: read
@@ -31,7 +28,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           aws-region: ap-south-2
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ vars.AWS_ROLE }}
 
       - name: Configure Terraform plugin cache
         run: |
@@ -59,6 +56,7 @@ jobs:
         with:
           name: tf-plan
           path: tfplan.tfplan
+
   apply:
     name: TF Apply
     needs: plan
@@ -66,27 +64,34 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.15.3"
+
       - name: Configure aws OIDC
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           aws-region: ap-south-2
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ vars.AWS_ROLE }}
+
       - name: Output file name
         run: echo "${{ needs.plan.outputs.plan-file }}"
+
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
           name: tf-plan
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: tf-dep-provider-${{ hashFiles('**/.terraform.lock.hcl') }}
+
       - name: Terraform INIT
         run: terraform init -input=false
+
       - name: Terraform apply
         run: terraform apply -auto-approve ${{ needs.plan.outputs.plan-file }}
